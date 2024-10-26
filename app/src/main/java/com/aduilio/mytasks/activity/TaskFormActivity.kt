@@ -1,6 +1,9 @@
 package com.aduilio.mytasks.activity
 
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.content.Intent
+import android.icu.util.Calendar
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
@@ -11,6 +14,11 @@ import androidx.appcompat.app.AppCompatActivity
 import com.aduilio.mytasks.databinding.ActivityTaskFormBinding
 import com.aduilio.mytasks.entity.Task
 import com.aduilio.mytasks.service.TaskService
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 class TaskFormActivity : AppCompatActivity() {
 
@@ -39,16 +47,82 @@ class TaskFormActivity : AppCompatActivity() {
     }
 
     private fun initComponents() {
+        binding.etDate.setOnClickListener{
+            initDatePicker()
+        }
+
+        binding.etTime.setOnClickListener{
+            initTimePicker()
+        }
         binding.btSave.setOnClickListener {
-            val task = Task(title = binding.etTitle.text.toString(), id = taskId)
-            taskService.save(task).observe(this) { responseDto ->
-                if (responseDto.isError) {
-                    Toast.makeText(this, "Erro com o servidor", Toast.LENGTH_SHORT).show()
-                } else {
-                    finish()
+            if(formIsValid()){
+                val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+                val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+
+                val task = Task(
+                    title = binding.etTitle.text.toString(),
+                    id = taskId,
+                    description = binding.etDescription.text.toString(),
+                    date = if (binding.etDate.text.isNullOrBlank()) null else LocalDate.parse(binding.etDate.text.toString(),dateFormatter),
+                    time = if (binding.etTime.text.isNullOrBlank()) null else LocalTime.parse(binding.etTime.text.toString(),timeFormatter)
+                )
+
+                Log.e("valores","Task: $task")
+                taskService.save(task).observe(this) { responseDto ->
+                    if (responseDto.isError) {
+                        Toast.makeText(this, "Erro com o servidor", Toast.LENGTH_SHORT).show()
+                    } else {
+                        finish()
+                    }
                 }
             }
         }
+    }
+
+    private fun initDatePicker() {
+        val calendar = Calendar.getInstance()
+        val year = calendar.get(Calendar.YEAR)
+        val month = calendar.get(Calendar.MONTH)
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+        val datePicker = DatePickerDialog(this, { _, selectedYear, selectedMonth, selectedDay ->
+            calendar.set(selectedYear, selectedMonth, selectedDay)
+
+            val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            val date = dateFormat.format(calendar.time)
+
+            binding.etDate.setText(date)
+        }, year, month, day)
+
+        datePicker.show()
+
+    }
+
+    private fun initTimePicker() {
+        val calendar = Calendar.getInstance()
+        val hour = calendar.get(Calendar.HOUR_OF_DAY)
+        val minute = calendar.get(Calendar.MINUTE)
+
+        val timePicker = TimePickerDialog(this, { _, selectedHour, selectedMinute ->
+            calendar.set(Calendar.HOUR_OF_DAY, selectedHour)
+            calendar.set(Calendar.MINUTE, selectedMinute)
+
+            val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+            val time = timeFormat.format(calendar.time)
+
+            binding.etTime.setText(time)
+        }, hour, minute, true) // `true` para formato 24h
+
+        timePicker.show() // Exibe o dialog ao chamar essa função
+    }
+
+    private fun formIsValid(): Boolean {
+        if(binding.etTitle.text.isNullOrEmpty()){
+            Toast.makeText(this, "O campo de texto deve ser preenchido", Toast.LENGTH_SHORT).show()
+            return false
+        }
+
+        return true
     }
 
     @Suppress("deprecation")
