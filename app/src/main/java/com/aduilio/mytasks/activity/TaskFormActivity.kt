@@ -11,8 +11,10 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import com.aduilio.mytasks.R
 import com.aduilio.mytasks.databinding.ActivityTaskFormBinding
 import com.aduilio.mytasks.entity.Task
+import com.aduilio.mytasks.extension.value
 import com.aduilio.mytasks.service.TaskService
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -30,16 +32,32 @@ class TaskFormActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        supportActionBar?.hide()
+
         binding = ActivityTaskFormBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        Log.e("lifecycle", "TaskForm onCreate")
-
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        intent.extras?.getString(Intent.EXTRA_TEXT)?.let { text ->
-            binding.etTitle.setText(text)
-            supportActionBar?.setDisplayHomeAsUpEnabled(false)
+        taskId = intent.getLongExtra("task_id",-1)
+
+        if(taskId !=- 1L){
+            taskService.getTaskById(taskId!!).observe(this){responseDto->
+                if(responseDto.isError){
+                    Toast.makeText(this, "A task não foi encontrada", Toast.LENGTH_SHORT).show()
+                }else{
+                    responseDto.value?.let {task->
+                        binding.etTitle.setText(task.title)
+                        binding.etDescription.setText(task.description)
+                        binding.etDate.setText(task.date?.toString())
+                        binding.etTime.setText(task.time?.toString())
+                    }
+
+                    Log.e("valores","${responseDto}")
+                }
+            }
+        }else{
+            taskId=null
         }
 
         initComponents()
@@ -56,7 +74,7 @@ class TaskFormActivity : AppCompatActivity() {
         }
         binding.btSave.setOnClickListener {
             if(formIsValid()){
-                val dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+                val dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
                 val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
                 val task = Task(
@@ -67,7 +85,7 @@ class TaskFormActivity : AppCompatActivity() {
                     time = if (binding.etTime.text.isNullOrBlank()) null else LocalTime.parse(binding.etTime.text.toString(),timeFormatter)
                 )
 
-                Log.e("valores","Task: $task")
+
                 taskService.save(task).observe(this) { responseDto ->
                     if (responseDto.isError) {
                         Toast.makeText(this, "Erro com o servidor", Toast.LENGTH_SHORT).show()
@@ -88,7 +106,7 @@ class TaskFormActivity : AppCompatActivity() {
         val datePicker = DatePickerDialog(this, { _, selectedYear, selectedMonth, selectedDay ->
             calendar.set(selectedYear, selectedMonth, selectedDay)
 
-            val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
             val date = dateFormat.format(calendar.time)
 
             binding.etDate.setText(date)
@@ -111,9 +129,9 @@ class TaskFormActivity : AppCompatActivity() {
             val time = timeFormat.format(calendar.time)
 
             binding.etTime.setText(time)
-        }, hour, minute, true) // `true` para formato 24h
+        }, hour, minute, true)
 
-        timePicker.show() // Exibe o dialog ao chamar essa função
+        timePicker.show()
     }
 
     private fun formIsValid(): Boolean {
@@ -130,6 +148,9 @@ class TaskFormActivity : AppCompatActivity() {
         (intent.extras?.getSerializable("task") as Task?)?.let { task ->
             taskId = task.id
             binding.etTitle.setText(task.title)
+            binding.etDescription.setText(task.description)
+            binding.etDate.setText(task.date.toString())
+            binding.etTime.setText(task.time.toString())
 
             if (task.completed) {
                 binding.btSave.visibility = View.INVISIBLE

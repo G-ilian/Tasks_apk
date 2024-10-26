@@ -57,9 +57,6 @@ class MainActivity : AppCompatActivity() {
         savedInstanceState?.let { state ->
             state.keySet().forEach { key -> Log.e("state", key) }
         }
-
-        val helper = NotificationHelper(this)
-//        helper.showNotification("Titulo da notificação 1", "Texto da notificação")
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -129,7 +126,7 @@ class MainActivity : AppCompatActivity() {
                     binding.etTitle?.setText(task.title)
                 } ?: run {
                     val intent = Intent(this@MainActivity, TaskFormActivity::class.java)
-                    intent.putExtra("task", task)
+                    intent.putExtra("task_id", task.id)
                     startActivity(intent)
                 }
             }

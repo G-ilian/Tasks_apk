@@ -25,4 +25,7 @@ interface TaskRepository {
 
     @POST("tasks/{id}/completed")
     fun markAsCompleted(@Path("id") id: Long): Call<Task>
+
+    @GET("tasks/{id}")
+    fun getTaskById(@Path("id") id:Long): Call<Task>
 }
