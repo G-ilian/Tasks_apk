@@ -161,14 +161,22 @@ class MainActivity : AppCompatActivity() {
 
         ItemTouchHelper(TaskItemTouchCallback(object : TaskItemSwipeListener {
             override fun onSwipe(position: Int) {
-                val task = tasksAdapter.getItem(position)
-                taskService.delete(task).observe(this@MainActivity) { responseDto ->
-                    if (responseDto.isError) {
+                AlertDialog.Builder(this@MainActivity)
+                    .setTitle("Exclusão da task")
+                    .setMessage("Você realmente deseja remover essa task ?")
+                    .setPositiveButton("Excluir"){_,_->
+                        val task = tasksAdapter.getItem(position)
+                        taskService.delete(task).observe(this@MainActivity) { responseDto ->
+                            if (responseDto.isError) {
+                                tasksAdapter.refreshItem(position)
+                            } else {
+                                tasksAdapter.deleteItem(position)
+                                Toast.makeText(this@MainActivity, "Tarefa excluída", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }.setNegativeButton("Cancelar"){_,_->
                         tasksAdapter.refreshItem(position)
-                    } else {
-                        tasksAdapter.deleteItem(position)
-                    }
-                }
+                    }.show()
             }
         })).attachToRecyclerView(binding.rvTasks)
 
