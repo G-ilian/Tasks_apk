@@ -16,6 +16,7 @@ google-services = "4.4.2"
 firebase-bom = "33.3.0"
 preference-ktx = "1.2.1"
 swipe-refresh-layout = "1.1.0"
+play-services-auth = "21.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -35,6 +36,7 @@ firebase-messaging-ktx = { group = "com.google.firebase", name = "firebase-messa
 firebase-auth-ktx = { group = "com.google.firebase", name = "firebase-auth-ktx" }
 preference-ktx = { group = "androidx.preference", name = "preference-ktx", version.ref = "preference-ktx" }
 swipe-refresh-layout = { group = "androidx.swiperefreshlayout", name = "swiperefreshlayout", version.ref = "swipe-refresh-layout" }
+play-services-auth = {group = "com.google.android.gms",name="play-services-auth",version.ref="play-services-auth"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

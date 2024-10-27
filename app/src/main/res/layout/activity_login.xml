@@ -64,4 +64,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btLogin" />
 
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/btLoginWithGoogle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btCreateAccount"
+        android:text="@string/login_with_google"
+        app:backgroundTint="@color/white"
+        app:strokeColor="@color/black"
+        />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
