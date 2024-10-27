@@ -13,6 +13,7 @@ class PreferenceFragment : PreferenceFragmentCompat() {
 
     companion object {
         const val DAILY_NOTIFICATION_KEY = "daily_notification"
+        const val DATE_FORMAT = "date_format"
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
