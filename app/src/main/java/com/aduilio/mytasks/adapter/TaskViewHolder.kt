@@ -9,6 +9,7 @@ import com.aduilio.mytasks.databinding.TaskListItemBinding
 import com.aduilio.mytasks.entity.Task
 import com.aduilio.mytasks.fragment.PreferenceFragment
 import com.aduilio.mytasks.listener.TaskItemClickListener
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -28,21 +29,27 @@ class TaskViewHolder(
         }?:run{
             "-"
         }
-        
+
         binding.tvDate.text = task.date?.let { date->
             if(dateFormat){
                 date.format(DateTimeFormatter.ofPattern("dd 'de' MMMM 'de' yyyy", Locale("pt", "BR")))
             }else{
                 date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
             }
-        }.toString()
-
-
-        if (task.completed) {
-            binding.leftBar.setBackgroundResource(R.color.green_700)
-        } else {
-            binding.leftBar.setBackgroundResource(R.color.blue_700)
+        }?:run{
+            "-"
         }
+
+
+        val color = when {
+            task.completed -> R.color.green_700
+            task.date == null || task.date!!.isAfter(LocalDate.now()) -> R.color.blue_700
+            task.date!!.isBefore(LocalDate.now().minusDays(1)) -> R.color.red_700
+            task.date!!.isEqual(LocalDate.now()) -> R.color.yellow_700
+            else -> R.color.blue_700
+        }
+
+        binding.leftBar.setBackgroundResource(color)
 
         binding.root.setOnClickListener {
             listener.onClick(task)
