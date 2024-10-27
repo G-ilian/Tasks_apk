@@ -27,7 +27,7 @@
     <string name="literal_date_format_off">A data será exibida no formato usual: 26/10/204</string>
     <string name="literal_date_format_on">A data será exibida de acordo com o nome do mês: 26 de outubro de 2024</string>
     <string name="literal_date">Exibição da data</string>
-    <string name="default_web_client_id">757633630882-drr5pa7v2l7f5h81rhj9o0u0f040h7p8.apps.googleusercontent.com</string>
+    <string name="default_web_client_id">_</string>
     <string name="login_with_google">Login com google</string>
 
 </resources>
